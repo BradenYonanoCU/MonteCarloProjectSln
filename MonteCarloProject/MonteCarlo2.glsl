@@ -122,6 +122,27 @@ vec4 pointRayWithRadius(vec3 rayD, vec3 rayO, vec3 p, float r){
     return vec4(rp, l2);
 }
 
+vec4 pointRayWithRadiusBackside(vec3 rayD, vec3 rayO, vec3 p, float r){
+    vec3 toP = p - rayO;
+    
+    float d = dot(rayD, toP);
+
+    if(dot(rayD, normalize(toP)) < 0.){
+        
+        return vec4(1000., 1000., 1000., 10. * r);
+        
+    }
+    
+    float l2 = dot(toP, toP) - (d * d);
+    
+    //THIS (the + vs -) is the only difference with the frontside function. See my desmos https://www.desmos.com/calculator/qamknlzsfw
+    d += sqrt((r*r) - l2);
+    
+    vec3 rp = (d * rayD) + rayO;
+    
+    return vec4(rp, l2);
+}
+
 vec3 CartToSph(vec3 c){
     float r = length(c);
     return vec3(r, atan(c.y, c.x), acos(c.z / r));
@@ -161,7 +182,7 @@ vec3 RaycastPlane(vec3 rayD, vec3 rayO, vec3 planeC, vec3 planeN, vec2 planeExt)
     vec3 TangentUp = normalize(cross(planeN, vec3(0., 0., 1.)));
     vec3 TangentRight = normalize(cross(planeN, TangentUp));
 
-    if(dot(rayD, planeN) > 0.){
+    if(false){//dot(rayD, planeN) > 0.){
 
         return Intersection;
     
@@ -183,6 +204,11 @@ vec3 RaycastPlane(vec3 rayD, vec3 rayO, vec3 planeC, vec3 planeN, vec2 planeExt)
             Intersection = vec3(100000.);
             
         }
+        else if( dot(rayD, normalize(Intersection - rayO)) < 0.){
+            
+            Intersection = vec3(100000.);
+
+        }
 
         
     }
@@ -191,6 +217,86 @@ vec3 RaycastPlane(vec3 rayD, vec3 rayO, vec3 planeC, vec3 planeN, vec2 planeExt)
     return Intersection;
     
 }
+
+void RaycastGlassSphere(inout vec3 rayD, inout vec3 rayO, out vec3 surfaceN, vec3 sphereC, float sphereR){
+    
+    //first trace against the sphere
+    vec4 initialCast = pointRayWithRadius(rayD, rayO, sphereC, sphereR);
+
+    //if no intersection then just return large vector
+    if(length(initialCast) > 100.){
+        
+         rayO = vec3(1000.);
+         return;
+
+    }
+
+
+
+    //decide whether this trace is going to refract or reflect upon hitting the sphere
+    float random = hash3(vec2(t, rayD.x * initialCast.y));
+    
+    //normal is just direction to intersection from center
+    vec3 normal = normalize(initialCast.xyz - sphereC);
+
+    //in less than .5, then reflect
+    if(random < .5){
+        
+        rayD = reflect(rayD, normal);
+        rayO = initialCast.xyz;
+        surfaceN = normal;
+        return;
+
+    }
+
+
+    
+
+    
+
+
+    
+
+
+    
+    //air is ~1. and glass is ~1.6 so glass/air ~1.6
+    vec3 internalD = refract(rayD, normal, 1. / 1.6);
+
+    //do a cast to the backside of the sphere along refraction direction
+    vec4 internalCast = pointRayWithRadiusBackside(internalD, initialCast.xyz, sphereC, sphereR);
+
+    //new normal is like before
+    normal = -normalize(internalCast.xyz - sphereC);
+
+    rayO = internalCast.xyz;
+    
+
+    //total internal reflection?
+    if(dot(internalD, normal) > cos(asin(1. / 1.6))){
+
+        //finally set the new refracted ray direction and ray origin
+        rayD = reflect(internalD, normal);
+        surfaceN = normal;
+
+        //finally set the new refracted ray direction and ray origin
+        //rayD = refract(internalD, normal, 1.6);
+        //surfaceN = -normal;
+
+        //imgOutput = vec4(0., 1., 0., 1.);
+
+    }
+    //else exit refraction
+    else{
+        
+        //finally set the new refracted ray direction and ray origin
+        rayD = refract(internalD, normal, 1.6);
+        surfaceN = -normal;
+
+    }
+
+    
+}
+
 
 
 vec3 DiffuseMaterialBounce(vec3 normal, vec3 randomSeed){
@@ -227,7 +333,7 @@ float DiffuseAttenuation(vec3 p, vec3 n, vec3 lightO){
     float attenuation = max(0., dot(normalize(lightO - p), n));
     
     float l = length(p - lightO);
-    attenuation /= (l * l);
+    attenuation /= (l);
 
     attenuation += .5;
 
@@ -254,9 +360,15 @@ mat4 RayCast(vec3 rayD, vec3 rayO, vec3 lightO){
 
     vec4 rayLight = pointRayWithRadius(rayD, rayO, lightO, .2);
 
+    vec3 glassD, glassP, glassN;
+    glassD = rayD;
+    glassP = rayO;
+    RaycastGlassSphere(glassD, glassP, glassN, vec3(-2., -.5, -.4), .5);
+
+
 
     float wallsDist = 1.5;
-    float wallsSize = 2.0;
+    float wallsSize = 5.0;
 
     vec3 rayPlaneFloor = RaycastPlane(rayD, rayO, vec3(0., 0., -1.1), normalize(vec3(0.05, 0.05, 1.)), vec2(wallsSize, wallsSize));
     vec3 rayPlaneXP = RaycastPlane(rayD, rayO, vec3(wallsDist, 0., 0.), normalize(vec3(-1., 0.05, 0.05)), vec2(wallsSize, wallsSize));
@@ -266,15 +378,18 @@ mat4 RayCast(vec3 rayD, vec3 rayO, vec3 lightO){
     vec3 rayPlaneCeil = RaycastPlane(rayD, rayO, vec3(0., 0., 1.5), normalize(vec3(0.05, 0.05, -1.)), vec2(wallsSize, wallsSize));
 
     float dSph = distance(rayO, rayPoint.xyz);
-    float dLi = distance(rayO, rayLight.xyz);
     float dPF = distance(rayO, rayPlaneFloor);
     float dPXP = distance(rayO, rayPlaneXP);
     float dPXN = distance(rayO, rayPlaneXN);
     float dPYP = distance(rayO, rayPlaneYP);
     float dPYN = distance(rayO, rayPlaneYN);
     float dPC = distance(rayO, rayPlaneCeil);
+    float dLi = distance(rayO, rayLight.xyz);
+    float dGSph = distance(rayO, glassP);
 
-    minD = min(dSph, min(dPF, min(dPXP, min(dPXN, min(dPYP, min(dPYN, min(dPC, dLi)))))));
+    //minD = min(dSph, min(dPF, min(dPXP, min(dPXN, min(dPYP, min(dPYN, min(dPC, min(dLi, dGSph))))))));
+    //this one doesn't include xn and yn
+    minD = min(dSph, min(dPF, min(dPXP, min(dPYP, min(dPC, min(dLi, dGSph))))));
     //minD = min(dSph, min(dPF, dLi));
 
     //make sure that if nothing is hit, then no min dist passes the differential check
@@ -391,7 +506,7 @@ mat4 RayCast(vec3 rayD, vec3 rayO, vec3 lightO){
     else if(abs(minD - dLi) < 0.05){
         
         //no attenuation here because this is the light source
-        addCol = vec4(1.5);
+        addCol = vec4(2.5);
 
         vec3 normal = normalize(rayLight.xyz - lightO);
 
@@ -401,8 +516,21 @@ mat4 RayCast(vec3 rayD, vec3 rayO, vec3 lightO){
 
 
     }
+    else if(abs(minD - dGSph) < 0.05){
 
-    //newCol = mix(newCol, addCol, 1. / float(frame));
+        newRayD = mix(glassD, DiffuseMaterialBounce(glassN, glassD), .05);
+        newRayO = glassP + newRayD * .001;
+        newNormal = glassN;
+
+        float attenuation = DiffuseAttenuation(newRayO, newNormal, lightO);
+
+        //no attenuation here because it's glass and perfectly refracts
+        addCol = vec4(.25) * attenuation;//vec4(diffuseReflectance) * .25;
+
+
+    }
+
+    
     newCol = addCol;
 
 
@@ -497,7 +625,7 @@ void main() {
     camForward = rotate3D(camForward, phi, theta);
     
 
-    vec3 lightO = vec3(-1., -2., -.5);
+    vec3 lightO = vec3(-2., -2., .5);
     vec3 lightDir = normalize(-lightO);
     float lightR = .2;
     
@@ -513,9 +641,6 @@ void main() {
     vec4 totalColor = vec4(0.);
     
     mat4 rayOne = RayCast(rayD, camC, lightO);
-
-    
-
     mat4 rayTwo = RayCast(rayOne[0].xyz, rayOne[1].xyz, lightO);
 
     vec3 endD = normalize(lightO - rayTwo[1].xyz);
@@ -528,10 +653,13 @@ void main() {
     if(length(rayEnd[3]) > 1.){
         
         float attenuation = max(0., dot(endD, rayTwo[2].xyz));
-        totalColor = rayEnd[3] * rayTwo[3] * rayOne[3];
+        vec4 baseColor = normalize(rayEnd[3]) * normalize(rayTwo[3]) * normalize(rayOne[3]);
+        float luminosity = rayEnd[3].a * rayTwo[3].a * rayOne[3].a * sqrt(3.);
+
+        totalColor = baseColor * luminosity;
 
         if(length(rayOne[3]) > 2.){
-            totalColor = rayOne[3];
+            //totalColor = rayOne[3];
         }
         
     }
