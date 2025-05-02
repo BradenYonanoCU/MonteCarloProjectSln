@@ -1,1 +1,3 @@
-﻿  MonteCarloProject.vcxproj -> C:\Users\byona\Documents\CU Boulder\MonteCarloProject\MonteCarloProjectSln\x64\Debug\MonteCarloProject.exe
+﻿  main.cpp
+C:\Users\byona\Documents\CU Boulder\MonteCarloProject\MonteCarloProjectSln\MonteCarloProject\main.cpp(110,26): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  MonteCarloProject.vcxproj -> C:\Users\byona\Documents\CU Boulder\MonteCarloProject\MonteCarloProjectSln\x64\Debug\MonteCarloProject.exe

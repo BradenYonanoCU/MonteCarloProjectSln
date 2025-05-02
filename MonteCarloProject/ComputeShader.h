@@ -23,7 +23,7 @@ public:
 
     void SetFloat(const std::string& name, float value) const;
 
-
+    void SetInt(const std::string& name, int value) const;
 };
 
 #endif // !COMPUTE_SHADER

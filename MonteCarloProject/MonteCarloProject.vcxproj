@@ -149,6 +149,7 @@
     </None>
     <None Include="computeB.glsl" />
     <None Include="MonteCarlo.glsl" />
+    <None Include="MonteCarlo2.glsl" />
     <None Include="screenQuadF.glsl" />
     <None Include="screenQuadV.glsl" />
   </ItemGroup>

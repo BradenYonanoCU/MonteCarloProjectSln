@@ -10,15 +10,15 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void renderQuad();
 
 // settings
-const unsigned int SCR_WIDTH = 1920;
-const unsigned int SCR_HEIGHT = 1080;
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 450;
 
 // texture size
 const unsigned int TEXTURE_WIDTH = 800, TEXTURE_HEIGHT = 450;
 
 // timing 
 float deltaTime = 0.0f; // time between current frame and last frame
-float lastFrame = 0.0f; // time of last frame
+float lastFrameTime = 0.0f; // time of last frame
 
 int main(int argc, char* argv[])
 {
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 	// build and compile shaders
 	// -------------------------
 	QuadShader screenQuad("screenQuadV.glsl", "screenQuadF.glsl");
-	ComputeShader computeShader("computeB.glsl");
+	ComputeShader computeShader("MonteCarlo2.glsl");
 
 	screenQuad.Use();
 	screenQuad.SetInt("tex", 0);
@@ -98,22 +98,60 @@ int main(int argc, char* argv[])
 	// render loop
 	// -----------
 	int fCounter = 0;
+	int Frame = -1;
+	float fpsTimerSet = 1.0f / 120.0f;
+	float frameTimer = fpsTimerSet;
+	float lastAcceptedFrameTime = 0.0f;
+	
 	while (!glfwWindowShouldClose(window))
 	{
 		// Set frame time
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-		if (fCounter > 500) {
-			std::cout << "FPS: " << 1 / deltaTime << std::endl;
+		
+		float currentFrameTime = glfwGetTime();
+		deltaTime = currentFrameTime - lastFrameTime;
+		lastFrameTime = currentFrameTime;
+		
+		
+		
+		//limit the fps
+		frameTimer -= deltaTime;
+		if (frameTimer > 0.0f) {
+
+			continue;
+
+		}
+		else {
+
+			frameTimer = fpsTimerSet;
+			
+		}
+
+		if (Frame > 500) {
+
+			//continue;
+
+		}
+
+		//output records of fps and what frame it is (output every 30 frames)
+		Frame++;
+		if (fCounter > 30) {
+			std::cout << "FPS: " << 1.0f / (currentFrameTime - lastAcceptedFrameTime)  << " | Frame: " << Frame << std::endl;
+			
 			fCounter = 0;
 		}
 		else {
 			fCounter++;
 		}
 
+		lastAcceptedFrameTime = currentFrameTime;
+
+
+		
+
+
 		computeShader.Use();
-		computeShader.SetFloat("t", currentFrame);
+		computeShader.SetFloat("t", currentFrameTime);
+		computeShader.SetInt("frame", Frame);
 		glDispatchCompute((unsigned int)TEXTURE_WIDTH / 10, (unsigned int)TEXTURE_HEIGHT / 10, 1);
 
 		// make sure writing to image has finished before read

@@ -6,6 +6,8 @@ layout(rgba32f, binding = 0) uniform image2D imgOutput;
 
 layout (location = 0) uniform float t;                 /** Time */
 
+layout (location = 1) uniform int frame;
+
 
 #define pi 3.1415926535897932
 #define halfPi 1.57079632679
@@ -104,6 +106,12 @@ vec4 pointRayWithRadius(vec3 rayD, vec3 rayO, vec3 p, float r){
     vec3 toP = p - rayO;
     
     float d = dot(rayD, toP);
+
+    if(dot(rayD, normalize(toP)) < 0.){
+        
+        return vec4(1000., 1000., 1000., 10. * r);
+        
+    }
     
     float l2 = dot(toP, toP) - (d * d);
     
@@ -146,8 +154,219 @@ float hillFunction(float x, float x0, float a){
 }
 
 
+vec3 RaycastPlane(vec3 rayD, vec3 rayO, vec3 planeC, vec3 planeN, vec2 planeExt){
+    
+    vec3 Intersection = vec3(100000.);
+
+    vec3 TangentUp = normalize(cross(planeN, vec3(0., 0., 1.)));
+    vec3 TangentRight = normalize(cross(planeN, TangentUp));
+
+    if(dot(rayD, planeN) > 0.){
+
+        return Intersection;
+    
+    }
+    else{
+        
+        float vt = -(dot(rayO - planeC, planeN)) / dot(rayD, planeN);
+        Intersection = (rayO + (vt * rayD));
+        
+        vec3 toI = Intersection - planeC;
+
+        float dU, dR;
+        dU = abs(dot(TangentUp, toI));
+        dR = abs(dot(TangentRight, toI));
+
+        // if outside of plane then set Intersection to a large number (indicating no intersection)
+        if(dU > planeExt.y || dR > planeExt.x){
+            
+            Intersection = vec3(100000.);
+            
+        }
+
+        
+    }
 
 
+    return Intersection;
+    
+}
+
+
+vec3 DiffuseMaterialBounce(vec3 normal, vec3 randomSeed){
+    
+    vec2 r = vec2(hash3(randomSeed.xy + t), hash3(randomSeed.zx + t));
+
+    /*
+    float theta = acos(sqrt(r.x));
+    float phi = 2. * pi * r.y;
+
+
+
+    vec3 randomBounce = rotate3D(normal, phi, theta);//vec3(sqrt(1. - r.x) * cos(2. * pi * r.y), sqrt(1. - r.x) * sin(2. * pi * r.y), sqrt(r.x));
+
+
+    return randomBounce;
+    */
+
+    float phi = 2.0 * pi * r.x;
+    float cosTheta = sqrt(1.0 - r.y);
+    float sinTheta = sqrt(r.y);
+    vec3 dv = vec3(cos(phi) * cosTheta, sin(phi) * cosTheta, sinTheta);
+
+    vec3 tangent = normalize(abs(normal.z) < 0.999 ? cross(normal, vec3(0.,0.,1.)) : cross(normal, vec3(0.,1.,0.)));
+    vec3 bitangent = cross(normal, tangent);
+    mat3 tangentFrame = mat3(tangent, bitangent, normal);
+
+    return normalize(tangentFrame * dv);
+}
+
+
+
+
+//returns resulting ray location, new ray direction (after reflecting or bouncing or diffracting), then new net ray color
+mat4 RayCast(vec3 rayD, vec3 rayO, vec3 lightO){
+    
+    float minD = 1000000.0f;
+    vec3 newRayD = rayD;
+    vec3 newRayO = rayO;
+    vec3 newNormal = vec3(0., 0., 1.);
+    vec4 newCol = vec4(0.);
+
+
+
+    vec3 sphereLoc = vec3(0.);
+
+    //First ray trace the sphere
+    vec4 rayPoint = pointRayWithRadius(rayD, rayO, sphereLoc, 1.);
+
+    vec4 rayLight = pointRayWithRadius(rayD, rayO, lightO, .2);
+
+
+    float wallsDist = 1.5;
+    float wallsSize = 2.0;
+
+    vec3 rayPlaneFloor = RaycastPlane(rayD, rayO, vec3(0., 0., -1.1), normalize(vec3(0.05, 0.05, 1.)), vec2(wallsSize, wallsSize));
+    vec3 rayPlaneXP = RaycastPlane(rayD, rayO, vec3(wallsDist, 0., 0.), normalize(vec3(-1., 0.05, 0.05)), vec2(wallsSize, wallsSize));
+    vec3 rayPlaneXN = RaycastPlane(rayD, rayO, vec3(-wallsDist * 10., 0., 0.), normalize(vec3(1., 0.05, 0.05)), vec2(wallsSize, wallsSize));
+    vec3 rayPlaneYP = RaycastPlane(rayD, rayO, vec3(0., wallsDist, 0.), normalize(vec3(0.05, -1., 0.05)), vec2(wallsSize, wallsSize));
+    vec3 rayPlaneYN = RaycastPlane(rayD, rayO, vec3(0., 10. * -wallsDist, 0.), normalize(vec3(0.05, 1., 0.05)), vec2(wallsSize, wallsSize));
+    vec3 rayPlaneCeil = RaycastPlane(rayD, rayO, vec3(0., 0., 1.5), normalize(vec3(0.05, 0.05, -1.)), vec2(wallsSize, wallsSize));
+
+    float dSph = distance(rayO, rayPoint.xyz);
+    float dLi = distance(rayO, rayLight.xyz);
+    float dPF = distance(rayO, rayPlaneFloor);
+    float dPXP = distance(rayO, rayPlaneXP);
+    float dPXN = distance(rayO, rayPlaneXN);
+    float dPYP = distance(rayO, rayPlaneYP);
+    float dPYN = distance(rayO, rayPlaneYN);
+    float dPC = distance(rayO, rayPlaneCeil);
+
+    minD = min(dSph, min(dPF, min(dPXP, min(dPXN, min(dPYP, min(dPYN, min(dPC, dLi)))))));
+    //minD = min(dSph, min(dPF, dLi));
+
+    //make sure that if nothing is hit, then no min dist passes the differential check
+    if (minD > 50.){
+        
+        minD = -1.;
+
+    }
+
+    vec4 addCol = vec4(0.);
+
+    float diffuseReflectance = .4;
+
+    if(abs(minD - dSph) < 0.05){
+        
+        addCol = vec4(.1);//vec4(dot(normalize(rayPoint.xyz), -lightD));
+        
+        vec3 normal = normalize(rayPoint.xyz - sphereLoc);
+
+        newRayD = normalize(rayD - (2. * dot(rayD, normal) * normal));
+        newRayO = rayPoint.xyz + .001 * newRayD;
+        newNormal = normal;
+
+    }
+
+    else if(abs(minD - dPF) < 0.05){
+        
+        addCol = diffuseReflectance * vec4(1., 1., 0., .8);
+        
+        newRayD = DiffuseMaterialBounce(vec3(0., 0., 1.), rayD);
+        newRayO = rayPlaneFloor + newRayD * .001;
+        newNormal = vec3(0., 0., 1.);
+
+    }
+
+    else if(abs(minD - dPXP) < 0.05){
+        
+        addCol = diffuseReflectance * vec4(1.);
+        
+        newRayD = DiffuseMaterialBounce(vec3(-1., 0., 0.), rayD);
+        newRayO = rayPlaneXP + newRayD * .001;
+        newNormal = vec3(-1., 0., 0.);
+
+    }
+    else if(abs(minD - dPXN) < 0.05){
+        
+        addCol = diffuseReflectance * vec4(.8);
+
+        newRayD = DiffuseMaterialBounce(vec3(1., 0., 0.), rayD);
+        newRayO = rayPlaneXN + newRayD * .001;
+        newNormal = vec3(1., 0., 0.);
+    }
+    else if(abs(minD - dPYP) < 0.05){
+        
+        addCol = diffuseReflectance * vec4(.8);
+
+        newRayD = DiffuseMaterialBounce(vec3(0., -1., 0.), rayD);
+        newRayO = rayPlaneYP + newRayD * .001;
+        newNormal = vec3(0., -1., 0.);
+        
+    }
+    else if(abs(minD - dPYN) < 0.05){
+        
+        addCol = diffuseReflectance * vec4(0., 0., 1., .8);
+
+        newRayD = DiffuseMaterialBounce(vec3(0., 1., 0.), rayD);
+        newRayO = rayPlaneYN + newRayD * .001;
+        newNormal = vec3(0., 1., 0.);
+        
+    }
+    else if(abs(minD - dPC) < 0.05){
+        
+        addCol = diffuseReflectance * vec4(.8);
+
+        newRayD = DiffuseMaterialBounce(vec3(0., 0., -1.), rayD);
+        newRayO = rayPlaneCeil + newRayD * .001;
+        newNormal = vec3(0., 0., -1.);
+        
+    }
+    else if(abs(minD - dLi) < 0.05){
+        
+        addCol = vec4(1.);
+
+        vec3 normal = normalize(rayPoint.xyz - lightO);
+
+        newRayD = DiffuseMaterialBounce(normal, rayD);
+        newRayO = rayPlaneCeil + newRayD * .001;
+        newNormal = normal;
+    }
+
+    //newCol = mix(newCol, addCol, 1. / float(frame));
+    newCol = addCol;
+
+
+
+    mat4 outData = mat4(
+    vec4(newRayD, 0.),
+    vec4(newRayO, 0.),
+    vec4(newNormal, 0.),
+    newCol
+    );
+
+    return outData;
+}
 
 
 
@@ -163,31 +382,57 @@ void main() {
     vec2 fragCoord = vec2(texelCoord);
     vec2 iResolution = vec2(gl_NumWorkGroups.xy * gl_WorkGroupSize.xy);
 
+    vec2 prop = iResolution.xy / iResolution.y;
+    vec4 col = imageLoad(imgOutput, texelCoord);
+    
+    if(frame == 0){
+        
+        col = vec4(0., 0., 0., 1.);
+        
+        
+    }
+
+
+    /*
     vec2 uv = fragCoord/iResolution;
-    vec2 prop = iResolution / iResolution.y;
-    //prop.y *= .8;
+    
+    
     vec2 uvc = prop * (2. * (uv - 0.5));
     vec2 uvcHat = normalize(uvc);
     
-    vec4 col = vec4(0.);
+    
+
     
     
     
+    
+    
+    uvc.x *= -1.;
+    //vec3 rayD = vec3(sqrt(1. - (oneThird * dot(uvc, uvc))), uvc.x / root3, uvc.y / root3);
+    
+    */
     float oneThird = 1. / 3.;
     float root3 = sqrt(3.);
-    uvc.x *= -1.;
-    vec3 rayD = vec3(sqrt(1. - (oneThird * dot(uvc, uvc))), uvc.x / root3, uvc.y / root3);
+
+    vec2 uv = fragCoord / iResolution.xy;
+    vec2 uvc = 2.0 * (uv - 0.5);
+    uvc.x *= iResolution.x / iResolution.y;
+
+    vec3 rayD = normalize(vec3(1.0, uvc.x, uvc.y));
     
-    
-    float phi = .3 * (t - 10.);
-    phi -= halfPi;
-    float theta = .5 * (t - 10.);
+
+
+    float camTime = 0.;
+
+    float phi = .3 * (camTime);
+    //phi -= halfPi;
+    float theta = .5 * (camTime);
     
     //phi = 1.5 * pi;
     //theta = 0.;
     theta = .4 * sin(theta);
     
-    float camCL = -4. * (.2 * sin(t * .5) + 1.);
+    float camCL = -5.;
     vec3 camC = camCL * vec3(1., 0., 0.);
     vec3 camForward = vec3(1., 0., 0.);
     vec3 camUp = vec3(0., 0., 1.);
@@ -203,55 +448,47 @@ void main() {
     camForward = rotate3D(camForward, phi, theta);
     
 
-    vec3 lightDir = normalize(vec3(-1., 0., 0.));
+    vec3 lightO = vec3(-1., 1., 1.);
+    vec3 lightDir = normalize(-lightO);
     
     
-    
-    //surface #####
-    vec4 rayPoint = pointRayWithRadius(rayD, camC, vec3(0.), 1.);
-    
-    vec3 p = rayPoint.xyz;
-    float l2 = rayPoint.w;
-    
-    
-    float lightDot = max(dot(normalize(p), -lightDir) + .05, 0.);
-    
-    //if we hit the planet then the rayPoint dist will be <= 1.
-    float hitPlanet = clamp(1. - floor(l2), 0., 1.);
-
-    vec4 groundColor = vec4(0.802, .41, .18, 1.);
-
-    col = hitPlanet * lightDot * groundColor;
-
-    //end surface #####
 
 
 
 
-    //atmosphere #####
-    rayPoint = pointRay(rayD, camC, vec3(0.));
-    p = rayPoint.xyz;
-    l2 = rayPoint.w;
-    
-    lightDot = mix(max(dot(normalize(p), -lightDir) + .2, 0.), lightDot, hitPlanet);
-    
-    
-    //tint towards blue at dawn/dusk (mars atmosphere)
-    vec4 atmoTint = mix(vec4(.1, .6, 2.1, 1.), vec4(1.), pow(lightDot, .25));
-    
-   
-    //add atmosphere
-    col += atmoTint * lightDot * AtmosphereDensity(l2, 1.0, 100.) * vec4(.85, .6, .5, 1.) * 2. / mix(l2 * l2, 1., hitPlanet) * .4;
-    col += atmoTint * lightDot * NegativeScatteringPotential(l2, 1.05, 100.) * vec4(.6, .5, .4, 1.) * 3.;
-    
-    //end atmosphere #####
 
 
 
-    //suggestion from @bloodnok
-    vec3 colGamma = pow(col.rgb, vec3(1.0/2.2));
+
+    vec4 totalColor = vec4(0.);
     
-    col.rgb = mix(col.rgb, colGamma, hitPlanet * lightDot);
+    mat4 rayOne = RayCast(rayD, camC, lightO);
+    mat4 rayTwo = RayCast(rayOne[0].xyz, rayOne[1].xyz, lightO);
+
+    vec3 ltc = normalize(rayTwo[1].xyz - lightO);
+
+    mat4 lightRay = RayCast(ltc, lightO + (.91 * ltc), lightO);
+
+    float distLtoR = distance(lightO, rayTwo[1].xyz);
+    float distLtoL = distance(lightO, lightRay[1].xyz);
+
+    if(abs(distLtoR - distLtoL) < .01){
+        
+        float attenuation = max(0., dot(-ltc, rayTwo[2].xyz));// * max(0., dot(ltc, lightDir));
+        totalColor = lightRay[3] * rayTwo[3] * rayOne[3];
+        
+    }
+    else{
+        //totalColor = vec4(1., 0., 0., 0.);
+    }
+
     
+    
+    //col = mix(col, totalColor, 1. / float(frame + 1));
+    col += totalColor / (float(frame + 1));
+
+
+    //col = vec4(dot(rayD, vec3(0., 0., -1.)));
+
     imageStore(imgOutput, texelCoord, col);
 }
