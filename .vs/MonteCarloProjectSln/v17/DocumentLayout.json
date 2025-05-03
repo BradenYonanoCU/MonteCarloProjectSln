@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\MonteCarlo2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\MonteCarlo2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\Metropolis.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\Metropolis.glsl||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\MonteCarlo2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\MonteCarlo2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\MonteCarlo.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -58,17 +58,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "main.cpp",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\main.cpp",
               "RelativeDocumentMoniker": "MonteCarloProject\\main.cpp",
               "ToolTip": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\main.cpp",
               "RelativeToolTip": "MonteCarloProject\\main.cpp",
-              "ViewState": "AgIAAEQAAAAAAAAAAAAUwEoAAAAoAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-04-13T07:06:19.617Z",
               "EditorCaption": ""
@@ -83,18 +83,17 @@
               "RelativeToolTip": "MonteCarloProject\\MonteCarlo.glsl",
               "ViewState": "AgIAAHIDAAAAAAAAAAAkwIUDAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-05-01T21:25:26.426Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-01T21:25:26.426Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "MonteCarlo2.glsl",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\MonteCarlo2.glsl",
               "RelativeDocumentMoniker": "MonteCarloProject\\MonteCarlo2.glsl",
               "ToolTip": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\MonteCarlo2.glsl",
               "RelativeToolTip": "MonteCarloProject\\MonteCarlo2.glsl",
-              "ViewState": "AgIAAIYCAAAAAAAAAAAkwJwCAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAIYCAAAAAAAAAAAkwI0CAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-05-02T14:31:54.979Z",
               "EditorCaption": ""
@@ -107,7 +106,7 @@
               "RelativeDocumentMoniker": "MonteCarloProject\\Metropolis.glsl",
               "ToolTip": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\Metropolis.glsl",
               "RelativeToolTip": "MonteCarloProject\\Metropolis.glsl",
-              "ViewState": "AgIAAGADAAAAAAAAAAAkwGoDAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAOABAAAAAAAAAAAkwOgBAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-05-02T20:46:57.483Z",
               "EditorCaption": ""

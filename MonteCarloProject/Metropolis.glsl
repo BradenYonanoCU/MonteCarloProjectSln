@@ -302,7 +302,7 @@ float DiffuseAttenuation(vec3 p, vec3 n, vec3 lightO){
     float attenuation = max(0., dot(normalize(lightO - p), n));
     
     float l = length(p - lightO);
-    attenuation /= (l);
+    attenuation /= (l * l);
 
     attenuation += .5;
 

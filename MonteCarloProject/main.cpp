@@ -1,3 +1,5 @@
+//most of this framework code from here https://learnopengl.com/Guest-Articles/2022/Compute-Shaders/Introduction
+
 #include "GL/glew.h"
 #include <GLFW/glfw3.h>
 #include <stdio.h>
@@ -128,7 +130,7 @@ int main(int argc, char* argv[])
 
 		if (currentFrameTime > 25.0f) {
 
-			continue;
+			//continue;
 
 		}
 
