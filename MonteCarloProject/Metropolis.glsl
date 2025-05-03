@@ -221,7 +221,7 @@ void RaycastGlassSphere(inout vec3 rayD, inout vec3 rayO, out vec3 surfaceN, vec
     vec3 normal = normalize(initialCast.xyz - sphereC);
 
     //in less than .5, then reflect
-    if(random < .1){
+    if(random < .3){
         
         rayD = reflect(rayD, normal);
         rayO = initialCast.xyz;
@@ -343,7 +343,7 @@ mat4 RayCast(vec3 rayD, vec3 rayO, vec3 lightO){
     vec3 glassD, glassP, glassN;
     glassD = rayD;
     glassP = rayO;
-    RaycastGlassSphere(glassD, glassP, glassN, vec3(-2., -1., -.2), .5);
+    RaycastGlassSphere(glassD, glassP, glassN, vec3(-2., .6, -.2), .5);
 
 
 
@@ -623,18 +623,6 @@ float InsertionTransitionPDF(vec3[maxPath] ProposalPath, int ProposalPathLength,
     
 }
 
-float EvaluatePathLuminosity(vec4[maxPath] PathRadiance, int PathLength){
-    
-    float totalLuminosity = 0.;
-    
-    for(int i = 0; i < PathLength; i++){
-        totalLuminosity += dot(PathRadiance[i].rgb, vec3(0.2126, .7152, 0.0722));
-    }
-    
-    return totalLuminosity;
-    
-}
-
 vec4 EvaluatePathColor(vec3[maxPath] Path, vec4[maxPath] PathRadiance, int PathLength, vec3 camC, vec3 lightO){
     vec4 color = vec4(1.);
 
@@ -660,15 +648,34 @@ vec4 EvaluatePathColor(vec3[maxPath] Path, vec4[maxPath] PathRadiance, int PathL
     return color;
 }
 
+float EvaluatePathLuminosity(vec3[maxPath] Path, vec4[maxPath] PathRadiance, int PathLength, vec3 camC, vec3 lightO){
+    
+    
+    float totalLuminosity = 0.;
+    
+    for(int i = 0; i < PathLength; i++){
+        totalLuminosity += dot(PathRadiance[i].rgb, vec3(0.2126, .7152, 0.0722));
+    }
+    
+    return totalLuminosity;
+    
+    /*
+    vec4 color = EvaluatePathColor(Path, PathRadiance, PathLength, camC, lightO);
+
+    return dot(color.rgb, vec3(0.2126, .7152, 0.0722));
+    */
+}
+
+
 
 
 //NOTE: these two functions are completely symmetric if you pass path = proposal for one or the other
 // note that DeletedVertIndex must be the index of the original vertex in the base path that was deleted
-float DeletionAcceptance(vec3[maxPath] Path, vec4[maxPath] PathRadiance, int PathLength, vec3[maxPath] Proposal, vec4[maxPath] ProposalRadiance, int ProposalLength, int DeletedVertIndex){
+float DeletionAcceptance(vec3[maxPath] Path, vec4[maxPath] PathRadiance, int PathLength, vec3[maxPath] Proposal, vec4[maxPath] ProposalRadiance, int ProposalLength, vec3 camC, vec3 lightO, int DeletedVertIndex){
     
-    float PathLuminosity = EvaluatePathLuminosity(PathRadiance, PathLength);
+    float PathLuminosity = EvaluatePathLuminosity(Path, PathRadiance, PathLength, camC, lightO);
     
-    float ProposalLuminosity = EvaluatePathLuminosity(ProposalRadiance, ProposalLength);
+    float ProposalLuminosity = EvaluatePathLuminosity(Proposal, ProposalRadiance, ProposalLength, camC, lightO);
     
     
     if(PathLuminosity <= 0. || ProposalLuminosity <= 0.){
@@ -686,13 +693,13 @@ float DeletionAcceptance(vec3[maxPath] Path, vec4[maxPath] PathRadiance, int Pat
 }
 
 // note that InsertedVertIndex must be the index of the new vertex in the new proposal path
-float InsertionAcceptance(vec3[maxPath] Path, vec4[maxPath] PathRadiance, int PathLength, vec3[maxPath] Proposal, vec4[maxPath] ProposalRadiance, int ProposalLength, int InsertedVertIndex){
+float InsertionAcceptance(vec3[maxPath] Path, vec4[maxPath] PathRadiance, int PathLength, vec3[maxPath] Proposal, vec4[maxPath] ProposalRadiance, int ProposalLength, vec3 camC, vec3 lightO, int InsertedVertIndex){
     
-    float PathLuminosity = EvaluatePathLuminosity(PathRadiance, PathLength);
+    float PathLuminosity = EvaluatePathLuminosity(Path, PathRadiance, PathLength, camC, lightO);
     
-    float ProposalLuminosity = EvaluatePathLuminosity(ProposalRadiance, ProposalLength);
+    float ProposalLuminosity = EvaluatePathLuminosity(Proposal, ProposalRadiance, ProposalLength, camC, lightO);
     
-    if(PathLuminosity <= 0. || ProposalLuminosity <= 0.){
+    if(PathLuminosity <= 0.1 || ProposalLuminosity <= 0.1){
         return 0.;
     }
     
@@ -796,7 +803,7 @@ void main() {
     camForward = rotate3D(camForward, phi, theta);
     
 
-    vec3 lightO = vec3(-2., -2., .9);
+    vec3 lightO = vec3(-2., -.1, .0);
     vec3 lightDir = normalize(-lightO);
     float lightR = .2;
     
@@ -869,8 +876,8 @@ void main() {
             DeleteRandomVertex(tentativePath, tentativePathRadiance, tentativePathLength, mutationIndex, iterSeed * uv.yx);
             
             acceptanceProbability = DeletionAcceptance(path, pathRadiance, pathLength, 
-            tentativePath, tentativePathRadiance, tentativePathLength, 
-            mutationIndex);
+            tentativePath, tentativePathRadiance, tentativePathLength,
+            camC, lightO, mutationIndex);
             
         }
         else if(pathLength < maxPath){
@@ -879,7 +886,7 @@ void main() {
             
             acceptanceProbability = InsertionAcceptance(path, pathRadiance, pathLength, 
             tentativePath, tentativePathRadiance, tentativePathLength, 
-            mutationIndex);
+            camC, lightO, mutationIndex);
             
         }
         
@@ -898,7 +905,7 @@ void main() {
         
         
         
-        totalColor += 1. * log(min(EvaluatePathColor(path, pathRadiance, pathLength, camC, lightO), .8) + 1.);
+        totalColor += log(min(EvaluatePathColor(path, pathRadiance, pathLength, camC, lightO), .8) + 1.);
         
     }
     
@@ -906,10 +913,10 @@ void main() {
     
     totalColor /= float(N);
     
-    col += totalColor / pow(float(frame + 1), .8);
+    col += totalColor / pow(float(frame + 1), 1.);
 
-
-    //col = vec4(float(acceptances) / 6.);
+    
+    //col = mix(imageLoad(imgOutput, texelCoord), vec4(float(acceptances) / float(N)), .1);
 
     imageStore(imgOutput, texelCoord, col);
 }
