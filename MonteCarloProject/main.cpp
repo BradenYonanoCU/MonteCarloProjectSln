@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 	// build and compile shaders
 	// -------------------------
 	QuadShader screenQuad("screenQuadV.glsl", "screenQuadF.glsl");
-	ComputeShader computeShader("MonteCarlo2.glsl");
+	ComputeShader computeShader("Metropolis.glsl");
 
 	screenQuad.Use();
 	screenQuad.SetInt("tex", 0);

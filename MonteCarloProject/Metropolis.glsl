@@ -333,7 +333,7 @@ mat4 RayCast(vec3 rayD, vec3 rayO, vec3 lightO){
 
 
 
-    vec3 sphereLoc = vec3(0.);
+    vec3 sphereLoc = vec3(0., -1., 0.);
 
     //First ray trace the sphere
     vec4 rayPoint = pointRayWithRadius(rayD, rayO, sphereLoc, 1.);
@@ -803,7 +803,7 @@ void main() {
     camForward = rotate3D(camForward, phi, theta);
     
 
-    vec3 lightO = vec3(-2., -.1, .0);
+    vec3 lightO = vec3(-2., -.4, .0);
     vec3 lightDir = normalize(-lightO);
     float lightR = .2;
     
