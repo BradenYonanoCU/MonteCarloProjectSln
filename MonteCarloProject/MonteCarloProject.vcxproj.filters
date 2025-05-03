@@ -47,5 +47,6 @@
     <None Include="MonteCarlo.glsl" />
     <None Include="MonteCarlo2.glsl" />
     <None Include="Metropolis.glsl" />
+    <None Include="Metropolis2.glsl" />
   </ItemGroup>
 </Project>
