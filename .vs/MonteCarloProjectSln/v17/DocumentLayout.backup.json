@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\Metropolis2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\Metropolis2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\Metropolis2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\Metropolis2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\Metropolis.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -62,17 +62,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "main.cpp",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\main.cpp",
               "RelativeDocumentMoniker": "MonteCarloProject\\main.cpp",
               "ToolTip": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\main.cpp",
               "RelativeToolTip": "MonteCarloProject\\main.cpp",
-              "ViewState": "AgIAAEIAAAAAAAAAAAAAAEwAAAAxAAAAAAAAAA==",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAAAE8AAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-04-13T07:06:19.617Z",
               "EditorCaption": ""
@@ -111,12 +111,11 @@
               "RelativeToolTip": "MonteCarloProject\\Metropolis.glsl",
               "ViewState": "AgIAAHkDAAAAAAAAAAAkwIYDAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-05-02T20:46:57.483Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-02T20:46:57.483Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Metropolis2.glsl",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\Metropolis2.glsl",
               "RelativeDocumentMoniker": "MonteCarloProject\\Metropolis2.glsl",
@@ -124,8 +123,7 @@
               "RelativeToolTip": "MonteCarloProject\\Metropolis2.glsl",
               "ViewState": "AgIAADUDAAAAAAAAAAAAAFcBAABNAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-05-03T14:53:41.508Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-03T14:53:41.508Z"
             },
             {
               "$type": "Document",
