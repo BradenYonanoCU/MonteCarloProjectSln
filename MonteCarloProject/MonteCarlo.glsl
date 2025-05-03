@@ -12,12 +12,6 @@ layout (location = 1) uniform int frame;
 #define pi 3.1415926535897932
 #define halfPi 1.57079632679
 
-#define maxPath 8
-#define N 6
-
-
-
-
 float hash3(vec2 xy){
     xy = mod(xy, .19);
     float h = dot(xy.yyx,vec3(.013, 27.15, 2027.3));
@@ -25,13 +19,6 @@ float hash3(vec2 xy){
     h *= fract(h);
     
     return fract(h);
-}
-
-
-bool Chance(float probability, vec2 seed){
-    
-    return hash3(seed) < probability;
-    
 }
 
 
@@ -64,6 +51,22 @@ vec3 inverseRotate3D(vec3 v, float phi, float theta){
     mat3 inv = inverse(rot);
     
     return inv * v;
+}
+
+float cloudNoise1(vec2 frag, float scale){
+    
+    frag *= scale;
+    
+    frag = floor(frag);
+    
+    frag += 1000.0f;
+    
+    vec2 frag2 = rotate(frag, frag.y);
+    vec2 frag3 = rotate(frag, frag.x);    
+    
+    
+    
+    return fract(frag2.y - frag3.x);// * frag2.y;
 }
 
 
@@ -146,24 +149,30 @@ vec3 CartToSph(vec3 c){
 }
 
 
+float AtmosphereDensity(float x, float x0, float a){
+    float r = x - x0;
+    float fx = 1. / (1. + (a * abs(pow(abs(r), 1.6))));
+    float gx = .1 * (tanh(-1. * pow(a, 1. / 3.) * r) + 1.5);
+    float hx = .5 * (tanh(3. * (x - (.5 * x0))) + 1.5);
+    
+    return fx + (gx * hx);
+}
 
+//this is the negative potential function if you consider 
+// the AtmosphereDensity as a field strength
+//The negative of the potential function is proportional to the
+// energy at a point, or in this case, the amount of light scattered
+float NegativeScatteringPotential(float r, float R, float a){
+    float r1 = r - R;
+    float roota = sqrt(a);
+    return (1. / (roota)) * (halfPi - atan(r1 * roota));
+    
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+float hillFunction(float x, float x0, float a){
+    float r = x - x0;
+    return 1. / (1. + (a * (r * r)));
+}
 
 
 vec3 RaycastPlane(vec3 rayD, vec3 rayO, vec3 planeC, vec3 planeN, vec2 planeExt){
@@ -173,25 +182,35 @@ vec3 RaycastPlane(vec3 rayD, vec3 rayO, vec3 planeC, vec3 planeN, vec2 planeExt)
     vec3 TangentUp = normalize(cross(planeN, vec3(0., 0., 1.)));
     vec3 TangentRight = normalize(cross(planeN, TangentUp));
 
-    float vt = -(dot(rayO - planeC, planeN)) / dot(rayD, planeN);
-    Intersection = (rayO + (vt * rayD));
-        
-    vec3 toI = Intersection - planeC;
+    if(false){//dot(rayD, planeN) > 0.){
 
-    float dU, dR;
-    dU = abs(dot(TangentUp, toI));
-    dR = abs(dot(TangentRight, toI));
-
-    // if outside of plane then set Intersection to a large number (indicating no intersection)
-    if(dU > planeExt.y || dR > planeExt.x){
-            
-        Intersection = vec3(100000.);
-            
+        return Intersection;
+    
     }
-    else if( dot(rayD, normalize(Intersection - rayO)) < 0.){
-            
-        Intersection = vec3(100000.);
+    else{
+        
+        float vt = -(dot(rayO - planeC, planeN)) / dot(rayD, planeN);
+        Intersection = (rayO + (vt * rayD));
+        
+        vec3 toI = Intersection - planeC;
 
+        float dU, dR;
+        dU = abs(dot(TangentUp, toI));
+        dR = abs(dot(TangentRight, toI));
+
+        // if outside of plane then set Intersection to a large number (indicating no intersection)
+        if(dU > planeExt.y || dR > planeExt.x){
+            
+            Intersection = vec3(100000.);
+            
+        }
+        else if( dot(rayD, normalize(Intersection - rayO)) < 0.){
+            
+            Intersection = vec3(100000.);
+
+        }
+
+        
     }
 
 
@@ -221,7 +240,7 @@ void RaycastGlassSphere(inout vec3 rayD, inout vec3 rayO, out vec3 surfaceN, vec
     vec3 normal = normalize(initialCast.xyz - sphereC);
 
     //in less than .5, then reflect
-    if(random < .1){
+    if(random < .25){
         
         rayD = reflect(rayD, normal);
         rayO = initialCast.xyz;
@@ -284,6 +303,18 @@ vec3 DiffuseMaterialBounce(vec3 normal, vec3 randomSeed){
     
     vec2 r = vec2(hash3(randomSeed.xy + t), hash3(randomSeed.zx + t));
 
+    /*
+    float theta = acos(sqrt(r.x));
+    float phi = 2. * pi * r.y;
+
+
+
+    vec3 randomBounce = rotate3D(normal, phi, theta);//vec3(sqrt(1. - r.x) * cos(2. * pi * r.y), sqrt(1. - r.x) * sin(2. * pi * r.y), sqrt(r.x));
+
+
+    return randomBounce;
+    */
+
     float phi = 2.0 * pi * r.x;
     float cosTheta = sqrt(1.0 - r.y);
     float sinTheta = sqrt(r.y);
@@ -307,17 +338,6 @@ float DiffuseAttenuation(vec3 p, vec3 n, vec3 lightO){
     attenuation += .5;
 
     return attenuation;
-}
-
-
-vec4 DiffuseBRDF(vec3 rayIncident, vec3 rayDeparting, vec3 normal, vec3 color, float intensity){
-
-    vec3 outColor = color / pi;
-
-    float luminosity = dot(outColor, vec3(0.2127, 0.7152, 0.0722));
-
-    return vec4(outColor, luminosity);
-
 }
 
 
@@ -381,7 +401,7 @@ mat4 RayCast(vec3 rayD, vec3 rayO, vec3 lightO){
 
     vec4 addCol = vec4(0.);
 
-    float diffuseReflectance = .1;
+    float diffuseReflectance = .4;
 
     if(abs(minD - dSph) < 0.05){
         
@@ -498,7 +518,7 @@ mat4 RayCast(vec3 rayD, vec3 rayO, vec3 lightO){
     }
     else if(abs(minD - dGSph) < 0.05){
 
-        newRayD = mix(glassD, DiffuseMaterialBounce(glassN, glassD), .01);
+        newRayD = mix(glassD, DiffuseMaterialBounce(glassN, glassD), .05);
         newRayO = glassP + newRayD * .001;
         newNormal = glassN;
 
@@ -524,197 +544,6 @@ mat4 RayCast(vec3 rayD, vec3 rayO, vec3 lightO){
 
     return outData;
 }
-
-
-
-
-
-
-
-
-
-void DeleteRandomVertex(inout vec3[maxPath] Proposal, inout vec4[maxPath] ProposalRadiance, inout int ProposalLength, out int RemVertIndex, vec2 seed){
-    
-    int rint = int(hash3(seed) * float(ProposalLength));
-    rint = min(rint, ProposalLength - 1);
-    
-    RemVertIndex = rint;
-    
-    for(int i = rint; i < ProposalLength - 1; i++){
-        Proposal[i] = Proposal[i + 1];
-        ProposalRadiance[i] = ProposalRadiance[i + 1];
-    }
-    
-    
-    //no matter what the former last index should become an invalid point
-    Proposal[ProposalLength - 1] = vec3(1000.);
-    ProposalRadiance[ProposalLength - 1] = vec4(1000.);
-    
-    
-    
-    ProposalLength--;
-    
-}
-
-void InsertRandomVertex(inout vec3[maxPath] Proposal, inout vec4[maxPath] ProposalRadiance, inout int ProposalLength, out int NewVertIndex, vec3 lightO, vec3 camC, vec2 seed){
-    
-    //in theory rint should be of 0 to 2 less than the number of vertices
-    // in a path. However, I don't include either the camera or the light source
-    // in the path list, but the segments connecting the light source and the last
-    // bounce is a valid segment. Therefore the valid segment count is actually
-    // pathlength. With one bounce, there is one segment.
-    int rint = int(hash3(seed) * float(ProposalLength));
-    
-    NewVertIndex = rint + 1;
-    
-    //with all the above said, when I pick a random int (rint), this
-    // value should be 0 for the first segment, and n - 1 for the last segment of a 
-    // path of length n vertices, and n segments.
-    rint = min(rint, ProposalLength - 1);
-    
-    
-    
-    mat4 segmentStartVertexData;
-    //if the chosen segment is the first one, retrace from camera to first bounce
-    if(rint == 0){
-        segmentStartVertexData = RayCast(normalize(Proposal[rint] - camC), camC, lightO);
-    }
-    //if the chosen segment is a middle segment, retrace a ray from vertex before to segment start
-    else{
-        segmentStartVertexData = RayCast(normalize(Proposal[rint] - Proposal[rint - 1]), camC, lightO);
-    }
-    
-    mat4 newVertex = RayCast(segmentStartVertexData[0].xyz, segmentStartVertexData[1].xyz, lightO);
-    
-    
-    
-    for(int i = ProposalLength; i > rint; i--){
-        
-        Proposal[i] = Proposal[i - 1];
-        ProposalRadiance[i] = ProposalRadiance[i - 1];
-        
-    }
-    
-    Proposal[rint + 1] = newVertex[1].xyz;
-    ProposalRadiance[rint + 1] = newVertex[3];
-    
-    ProposalLength++;
-    
-}
-
-float DeletionTransitionPDF(int ProposalLength){
-    
-    return 1. / float(ProposalLength + 1);
-    
-}
-
-float InsertionTransitionPDF(vec3[maxPath] ProposalPath, int ProposalPathLength, int NewVertIndex){
-    
-    float probability = 1. / float(ProposalPathLength - 1);
-    
-    vec3 dv = normalize(ProposalPath[NewVertIndex] - ProposalPath[NewVertIndex - 1]);
-    
-    //lightO has no bearing on this normal retrieval so pass vec3(0.) for it
-    vec3 prevVertNormal = RayCast(-dv, ProposalPath[NewVertIndex - 1] + (dv * .1), vec3(0.))[2].xyz;
-    
-    float directionalPDF = max(0., dot(dv, prevVertNormal) / pi);
-    
-    return probability * directionalPDF;
-    
-}
-
-float EvaluatePathLuminosity(vec4[maxPath] PathRadiance, int PathLength){
-    
-    float totalLuminosity = 0.;
-    
-    for(int i = 0; i < PathLength; i++){
-        totalLuminosity += dot(PathRadiance[i].rgb, vec3(0.2126, .7152, 0.0722));
-    }
-    
-    return totalLuminosity;
-    
-}
-
-vec4 EvaluatePathColor(vec3[maxPath] Path, vec4[maxPath] PathRadiance, int PathLength, vec3 camC, vec3 lightO){
-    vec4 color = vec4(1.);
-
-    mat4 rayResult = RayCast(normalize(Path[0] - camC), camC, lightO);
-
-    vec4 newColor = rayResult[3];
-
-    color = newColor;
-
-
-    for(int i = 1; i < PathLength; i++){
-
-        color *= PathRadiance[i];
-    }
-
-
-    rayResult = RayCast(normalize(lightO - Path[PathLength - 1]), Path[PathLength - 1], lightO);
-    
-    color *= rayResult[3];
-
-    
-    
-    return color;
-}
-
-
-
-//NOTE: these two functions are completely symmetric if you pass path = proposal for one or the other
-// note that DeletedVertIndex must be the index of the original vertex in the base path that was deleted
-float DeletionAcceptance(vec3[maxPath] Path, vec4[maxPath] PathRadiance, int PathLength, vec3[maxPath] Proposal, vec4[maxPath] ProposalRadiance, int ProposalLength, int DeletedVertIndex){
-    
-    float PathLuminosity = EvaluatePathLuminosity(PathRadiance, PathLength);
-    
-    float ProposalLuminosity = EvaluatePathLuminosity(ProposalRadiance, ProposalLength);
-    
-    
-    if(PathLuminosity <= 0. || ProposalLuminosity <= 0.){
-        return 0.;
-    }
-    
-    float LuminosityRatio = ProposalLuminosity / PathLuminosity;
-    
-    float ProposalTransition = DeletionTransitionPDF(ProposalLength);
-    
-    float PathTransition = InsertionTransitionPDF(Path, PathLength, DeletedVertIndex);
-    
-    return min(1., LuminosityRatio * (ProposalTransition / PathTransition));
-
-}
-
-// note that InsertedVertIndex must be the index of the new vertex in the new proposal path
-float InsertionAcceptance(vec3[maxPath] Path, vec4[maxPath] PathRadiance, int PathLength, vec3[maxPath] Proposal, vec4[maxPath] ProposalRadiance, int ProposalLength, int InsertedVertIndex){
-    
-    float PathLuminosity = EvaluatePathLuminosity(PathRadiance, PathLength);
-    
-    float ProposalLuminosity = EvaluatePathLuminosity(ProposalRadiance, ProposalLength);
-    
-    if(PathLuminosity <= 0. || ProposalLuminosity <= 0.){
-        return 0.;
-    }
-    
-    float LuminosityRatio = ProposalLuminosity / PathLuminosity;
-    
-    float ProposalTransition = InsertionTransitionPDF(Proposal, ProposalLength, InsertedVertIndex);
-    
-    float PathTransition = DeletionTransitionPDF(PathLength);
-    
-    return min(1., LuminosityRatio * (ProposalTransition / PathTransition));
-    
-}
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -796,7 +625,7 @@ void main() {
     camForward = rotate3D(camForward, phi, theta);
     
 
-    vec3 lightO = vec3(-2., -2., .9);
+    vec3 lightO = vec3(-2., -2., .5);
     vec3 lightDir = normalize(-lightO);
     float lightR = .2;
     
@@ -809,107 +638,42 @@ void main() {
 
 
 
-    
-    int pathMutationIndex = 0;
-    int pathLength = 0;
-    vec3 path[maxPath] = vec3[](
-    vec3(1000.), vec3(1000.), vec3(1000.), vec3(1000.),
-    vec3(1000.), vec3(1000.), vec3(1000.), vec3(1000.));
-    vec4 pathRadiance[maxPath] = vec4[](
-    vec4(1000.), vec4(1000.), vec4(1000.), vec4(1000.),
-    vec4(1000.), vec4(1000.), vec4(1000.), vec4(1000.));
-
-    
-    mat4 rayResult = RayCast(rayD, camC, lightO);
-    path[0] = rayResult[1].xyz;
-    pathRadiance[0] = rayResult[3];
-    
-
-    
-    rayResult = RayCast(rayResult[0].xyz, rayResult[1].xyz, lightO);
-    path[1] = rayResult[1].xyz;
-    pathRadiance[1] = rayResult[3];
-    
-    pathLength = 2;
-
-    
-    if(distance(path[0].xyz, camC) < .01){
-        imageStore(imgOutput, texelCoord, vec4(0.));
-        return;
-    }
-    
-    int tentativePathLength = 0;
-    vec3 tentativePath[maxPath];
-    vec4 tentativePathRadiance[maxPath];
-    
-    
-    int mutationIndex = -1;
-    float acceptanceProbability = 0.;
-    float xi3 = 1.;
-
     vec4 totalColor = vec4(0.);
     
-    
-    int acceptances = 0;
-    
-    for(int i = 0; i < N; i++){
-        
-        vec2 iterSeed = fragCoord.xy + vec2(i * 17.37, float(frame) * 193.67);
-        
-        bool deleteOrInsert = Chance(.5, iterSeed);
-        
-        //whew, apparaently glsl doesnt use pointers like c++ so this is okay actually
-        tentativePath = path;
-        tentativePathRadiance = pathRadiance;
-        tentativePathLength = pathLength;
-        
-        
-        if(deleteOrInsert && pathLength > 1){
-            
-            DeleteRandomVertex(tentativePath, tentativePathRadiance, tentativePathLength, mutationIndex, iterSeed * uv.yx);
-            
-            acceptanceProbability = DeletionAcceptance(path, pathRadiance, pathLength, 
-            tentativePath, tentativePathRadiance, tentativePathLength, 
-            mutationIndex);
-            
-        }
-        else if(pathLength < maxPath){
+    mat4 rayOne = RayCast(rayD, camC, lightO);
+    mat4 rayTwo = RayCast(rayOne[0].xyz, rayOne[1].xyz, lightO);
 
-            InsertRandomVertex(tentativePath, tentativePathRadiance, tentativePathLength, mutationIndex, lightO, camC, iterSeed * uv.yx);
-            
-            acceptanceProbability = InsertionAcceptance(path, pathRadiance, pathLength, 
-            tentativePath, tentativePathRadiance, tentativePathLength, 
-            mutationIndex);
-            
-        }
-        
-        
-        // xi3 (kai or kye) from Metropolis's original paper
-        xi3 = hash3(iterSeed * fragCoord);
-        
-        if(xi3 < acceptanceProbability){
-            path = tentativePath;
-            pathRadiance = tentativePathRadiance;
-            pathLength = tentativePathLength;
+    vec3 endD = normalize(lightO - rayTwo[1].xyz);
 
-            acceptances++;
+    mat4 rayEnd = RayCast(endD, rayTwo[1].xyz + (.001 * endD), lightO);
+
+    float distLtoE = distance(lightO, rayTwo[1].xyz) - lightR;
+    float distEtoL = distance(rayTwo[1].xyz, rayEnd[1].xyz);
+
+    if(length(rayEnd[3]) > 1.){
+        
+        float attenuation = max(0., dot(endD, rayTwo[2].xyz));
+        vec4 baseColor = normalize(rayEnd[3]) * normalize(rayTwo[3]) * normalize(rayOne[3]);
+        float luminosity = rayEnd[3].a * rayTwo[3].a * rayOne[3].a * sqrt(3.);
+
+        totalColor = baseColor * luminosity;
+
+        if(length(rayOne[3]) > 2.){
+            //totalColor = rayOne[3];
         }
-        
-        
-        
-        
-        totalColor += 1. * log(min(EvaluatePathColor(path, pathRadiance, pathLength, camC, lightO), .8) + 1.);
         
     }
+    else{
+        //totalColor = vec4(1., 0., 0., 0.);
+    }
+
     
     
-    
-    totalColor /= float(N);
-    
+    //col = mix(col, totalColor, 1. / float(frame + 1));
     col += totalColor / pow(float(frame + 1), .8);
 
 
-    //col = vec4(float(acceptances) / 6.);
+    //col = vec4(dot(rayD, vec3(0., 0., -1.)));
 
     imageStore(imgOutput, texelCoord, col);
 }
