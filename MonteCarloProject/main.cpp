@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 	// build and compile shaders
 	// -------------------------
 	QuadShader screenQuad("screenQuadV.glsl", "screenQuadF.glsl");
-	ComputeShader computeShader("MonteCarlo2.glsl");
+	ComputeShader computeShader("Metropolis.glsl");
 
 	screenQuad.Use();
 	screenQuad.SetInt("tex", 0);
@@ -126,15 +126,15 @@ int main(int argc, char* argv[])
 			
 		}
 
-		if (Frame > 500) {
+		if (currentFrameTime > 25.0f) {
 
-			//continue;
+			continue;
 
 		}
 
 		//output records of fps and what frame it is (output every 30 frames)
 		Frame++;
-		if (fCounter > 30) {
+		if (fCounter > 120) {
 			std::cout << "FPS: " << 1.0f / (currentFrameTime - lastAcceptedFrameTime)  << " | Frame: " << Frame << std::endl;
 			
 			fCounter = 0;

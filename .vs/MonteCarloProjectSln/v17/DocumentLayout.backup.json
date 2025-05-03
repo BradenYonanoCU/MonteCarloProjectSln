@@ -3,16 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\MonteCarlo2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\MonteCarlo2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\MonteCarlo.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\MonteCarlo.glsl||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\Metropolis.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\Metropolis.glsl||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\MonteCarlo2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|solutionrelative:MonteCarloProject\\MonteCarlo2.glsl||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8DBA934D-8392-4485-81FC-D3FCEB9A06A6}|MonteCarloProject\\MonteCarloProject.vcxproj|C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\computeB.glsl||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -54,17 +58,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "main.cpp",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\main.cpp",
               "RelativeDocumentMoniker": "MonteCarloProject\\main.cpp",
               "ToolTip": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\main.cpp",
               "RelativeToolTip": "MonteCarloProject\\main.cpp",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAUwBcAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAHQAAAAAAAAAAAAUwH0AAAADAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-04-13T07:06:19.617Z",
               "EditorCaption": ""
@@ -77,27 +81,40 @@
               "RelativeDocumentMoniker": "MonteCarloProject\\MonteCarlo.glsl",
               "ToolTip": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\MonteCarlo.glsl",
               "RelativeToolTip": "MonteCarloProject\\MonteCarlo.glsl",
-              "ViewState": "AgIAAMwBAAAAAAAAAAAAAOEBAAAiAAAAAAAAAA==",
+              "ViewState": "AgIAAHQDAAAAAAAAAAAAAHcDAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-05-01T21:25:26.426Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "MonteCarlo2.glsl",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\MonteCarlo2.glsl",
               "RelativeDocumentMoniker": "MonteCarloProject\\MonteCarlo2.glsl",
               "ToolTip": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\MonteCarlo2.glsl",
               "RelativeToolTip": "MonteCarloProject\\MonteCarlo2.glsl",
-              "ViewState": "AgIAAFwCAAAAAAAAAAAAAHMCAAAeAAAAAAAAAA==",
+              "ViewState": "AgIAAKACAAAAAAAAAAAAAKUCAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-05-02T14:31:54.979Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
+              "Title": "Metropolis.glsl",
+              "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\Metropolis.glsl",
+              "RelativeDocumentMoniker": "MonteCarloProject\\Metropolis.glsl",
+              "ToolTip": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\Metropolis.glsl",
+              "RelativeToolTip": "MonteCarloProject\\Metropolis.glsl",
+              "ViewState": "AgIAAF4CAAAAAAAAAAAAAHUCAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-05-02T20:46:57.483Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "computeB.glsl",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\computeB.glsl",
               "RelativeDocumentMoniker": "MonteCarloProject\\computeB.glsl",
@@ -109,7 +126,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "ComputeShader.cpp",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\ComputeShader.cpp",
               "RelativeDocumentMoniker": "MonteCarloProject\\ComputeShader.cpp",
@@ -121,7 +138,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "ComputeShader.h",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\ComputeShader.h",
               "RelativeDocumentMoniker": "MonteCarloProject\\ComputeShader.h",
@@ -133,7 +150,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "computeA.glsl",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\computeA.glsl",
               "RelativeDocumentMoniker": "MonteCarloProject\\computeA.glsl",
@@ -145,7 +162,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "QuadShader.cpp",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\QuadShader.cpp",
               "RelativeDocumentMoniker": "MonteCarloProject\\QuadShader.cpp",
@@ -157,7 +174,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "screenQuadF.glsl",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\screenQuadF.glsl",
               "RelativeDocumentMoniker": "MonteCarloProject\\screenQuadF.glsl",
@@ -169,7 +186,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "screenQuadV.glsl",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\screenQuadV.glsl",
               "RelativeDocumentMoniker": "MonteCarloProject\\screenQuadV.glsl",
@@ -181,7 +198,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "QuadShader.h",
               "DocumentMoniker": "C:\\Users\\byona\\Documents\\CU Boulder\\MonteCarloProject\\MonteCarloProjectSln\\MonteCarloProject\\QuadShader.h",
               "RelativeDocumentMoniker": "MonteCarloProject\\QuadShader.h",
